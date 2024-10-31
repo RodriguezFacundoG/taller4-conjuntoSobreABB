@@ -51,18 +51,35 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     public Nodo buscarNodo(T elem){ //Va a devolver el nodo padre donde tengo que hacer la insercion
         Nodo actual = raiz;
         boolean encontrePadre = false;
-        if(pertenece(elem)){
-            while (!encontrePadre){
-                if(elem.compareTo(actual.valor) > 0 && actual.der != null){
-                    actual = actual.der;
-                } else if (elem.compareTo(actual.valor) < 0 && actual.izq != null) {
-                    actual = actual.izq;
-                } else { //Esto corta cuando lo encuentra, pongo el flag en true y sale del while. Nunca pasará que no encuentre el nodo, si entro al if, lo tiene que encontrar si o si
-                    encontrePadre = true;                       
-                }
+        
+        while (actual != null && !encontrePadre){
+            if(elem.compareTo(actual.valor) > 0 && actual.der != null){
+                actual = actual.der;
+            } else if (elem.compareTo(actual.valor) < 0 && actual.izq != null) {
+                actual = actual.izq;
+            } else { //Esto corta cuando lo encuentra. En ese caso pongo el flag en true y en la prox iteracion no entra al while.
+                encontrePadre = true;                       
+            }
+        }    
+        return actual;       
+
+        /*
+         ### OTRA forma de implementarlo sin flag, pero retornando el nodo actual si lo encuentra, cuando son iguales (caso else)
+         Nodo actual = raiz;
+         Nodo padre = null;
+         while (actual != null) {
+            padre = actual;
+            if (elem.compareTo(actual.valor) > 0) {
+                actual = actual.der;
+            } else if (elem.compareTo(actual.valor) < 0) {
+                actual = actual.izq;
+            } else {
+                return actual; //El nodo ya existe en el arbol
             }
         }
-        return actual;
+        return padre; 
+        */
+        
     }
     public void insertar(T elem){
         Nodo aux;
@@ -206,7 +223,11 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
     }
 
     private class ABB_Iterador implements Iterador<T> {
-        private Nodo _actual = buscarNodo(minimo());
+        private Nodo _actual;
+        
+        public ABB_Iterador(){
+            this._actual = buscarNodo(minimo());
+        }
         
         public boolean haySiguiente() {     
             boolean res = false;
