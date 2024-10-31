@@ -37,16 +37,22 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             while(actual.izq != null) {
                 actual = actual.izq;
             }
+            return actual.valor;
+        } else {
+            return null;
         }
-        return actual.valor;
     }
 
     public T maximo(){
         Nodo actual = raiz; //Asumo que tiene al menos un elemento
-        while(actual.der != null){
-            actual = actual.der;
+        if(raiz!=null){
+            while(actual.der != null){
+                actual = actual.der;
+            }
+            return actual.valor;
+        } else {
+            return null;
         }
-        return actual.valor;
     }
     public Nodo buscarNodo(T elem){ //Va a devolver el nodo padre donde tengo que hacer la insercion
         Nodo actual = raiz;
@@ -188,22 +194,32 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             }
         }
     }
+    /*
+     * else if (nodo != null && nodo.padre == null) { //Si el abb tiene un solo nodo
+            return null;
+        } 
+     */
     private Nodo sucesor(Nodo nodo){
-        // caso tiene subarbol derecho
-        Nodo res;
-        if (nodo.der != null){
-            res = nodo.der;
-            while (res.izq != null){
-                res = res.izq;
-            }
+        if(nodo == null) { //Si el abb es vacio
+            return null;
         } else {
-        // caso contrario: no tiene subarbol derecho
-        res = nodo.padre;   
-            while (res.der != null && res.der.valor.equals(nodo.valor)) { //Corta cuando el padre del nodo, no tiene subarbol derecho. Por lo que si tengo solo arbol a la izquierda, el padre es el sucesor.
-                res = res.padre;
+            // caso tiene subarbol derecho
+            Nodo res = null;
+            if (nodo.der != null){
+                res = nodo.der;
+                while (res.izq != null){
+                    res = res.izq;
+                }
+            } else {
+            // caso contrario: no tiene subarbol derecho
+            res = nodo.padre;
+                while (res != null && res.der.valor.equals(nodo.valor)) { //Corta cuando el padre del nodo, no tiene subarbol derecho. Por lo que si tengo solo arbol a la izquierda, el padre es el sucesor.
+                    nodo = res;
+                    res = res.padre;         //En caso de que el padre tenga arbol a la derecha y el hijo derecho sea el nodo al que le busco sucesor, tengo que subir en el arbol
+                }                            //En todo momento lo que yo quiero es encontrar un hijo izquierdo, o sea no entrar al while
             }
+            return res;
         }
-        return res;
     }
 
     public String toString(){
@@ -211,11 +227,11 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         boolean esPrimero = true;
         String res = "{";
         while(it.haySiguiente()){
-            if(esPrimero){                
+            if(esPrimero){
                 res = res + it.siguiente();
                 esPrimero = false;
             } else {
-                res = res + it.haySiguiente() + " ,";
+                res = res + "," + it.siguiente();
             }
         }
         res += "}";
@@ -224,17 +240,13 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
 
     private class ABB_Iterador implements Iterador<T> {
         private Nodo _actual;
-        
+
         public ABB_Iterador(){
             this._actual = buscarNodo(minimo());
         }
         
         public boolean haySiguiente() {     
-            boolean res = false;
-            if(sucesor(_actual) != null){
-                res = true;
-            }
-            return res;
+            return _actual != null; 
         }
     
         public T siguiente() {
