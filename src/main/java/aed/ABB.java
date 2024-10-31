@@ -67,25 +67,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 encontrePadre = true;                       
             }
         }    
-        return actual;       
-
-        /*
-         ### OTRA forma de implementarlo sin flag, pero retornando el nodo actual si lo encuentra, cuando son iguales (caso else)
-         Nodo actual = raiz;
-         Nodo padre = null;
-         while (actual != null) {
-            padre = actual;
-            if (elem.compareTo(actual.valor) > 0) {
-                actual = actual.der;
-            } else if (elem.compareTo(actual.valor) < 0) {
-                actual = actual.izq;
-            } else {
-                return actual; //El nodo ya existe en el arbol
-            }
-        }
-        return padre; 
-        */
-        
+        return actual;        
     }
     public void insertar(T elem){
         Nodo aux;
@@ -186,19 +168,24 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             }
             else{ //Ambos nodos distintos de nulo
                 Nodo sucesor = sucesor(actual);
-                Nodo padreSucesor = sucesor.padre;
-                actual.valor = sucesor.valor; //copio el valor del nodo sucesor encontrado, ahora tengo que eliminarlo:
-                //tengo que ver si sucesor es el hijo izquierdo o derecho de padreSucesor
-                padreSucesor.izq = null; //Pero siempre es el izquierdo por como está hecho el metodo sucesor
-                cardinal --;
+                actual.valor = sucesor.valor;
+            
+                if (sucesor.padre.izq == sucesor) { // Si el sucesor es el hijo izquierdo de su padre
+                    sucesor.padre.izq = sucesor.der; 
+                } 
+                else {                            // Si el sucesor es el hijo derecho de su padre
+                    sucesor.padre.der = sucesor.der;
+                }
+                
+                if (sucesor.der != null) {
+                    sucesor.der.padre = sucesor.padre;
+                }
+            
+                cardinal--;
             }
         }
     }
-    /*
-     * else if (nodo != null && nodo.padre == null) { //Si el abb tiene un solo nodo
-            return null;
-        } 
-     */
+
     private Nodo sucesor(Nodo nodo){
         if(nodo == null) { //Si el abb es vacio
             return null;

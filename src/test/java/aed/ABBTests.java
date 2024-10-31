@@ -327,10 +327,10 @@ class ABBTests {
 
     }
 
-    Integer NCLAVES = 1000;
+    Integer NCLAVES = 10;
 
     private Integer clave(Integer i) {
-        return NCLAVES * ((i * i - 100 * i) % NCLAVES) + i;
+        return NCLAVES * ((i * i - 100 * i) % NCLAVES) + i; //funcion generadora de claves a partir de un indice
     }
 
     @Test
@@ -368,6 +368,7 @@ class ABBTests {
 
                 assertFalse(conjunto.pertenece(k));
             }
+            //System.out.println(conjunto.toString());
         }
         assertEquals(NCLAVES / 2, conjunto.cardinal());
 
