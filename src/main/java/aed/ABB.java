@@ -54,7 +54,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
             return null;
         }
     }
-    public Nodo buscarNodo(T elem){ //Va a devolver el nodo padre donde tengo que hacer la insercion
+    public Nodo buscarNodo(T elem){ //Encuentra el nodo asociado al valor elem. Si no está devuelve al padre para facilitar el metodo insertar
         Nodo actual = raiz;
         boolean encontrePadre = false;
         
@@ -63,11 +63,11 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 actual = actual.der;
             } else if (elem.compareTo(actual.valor) < 0 && actual.izq != null) {
                 actual = actual.izq;
-            } else { //Esto corta cuando lo encuentra. En ese caso pongo el flag en true y en la prox iteracion no entra al while.
-                encontrePadre = true;                       
+            } else { //Corto cuando lo encuentro, poniendo el flag en true para que no entre al while nuevamente. Ó cuando no està el elemento, devuelve el padre
+                encontrePadre = true;
             }
-        }    
-        return actual;        
+        }
+        return actual;
     }
     public void insertar(T elem){
         Nodo aux;
@@ -110,66 +110,74 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
         }
         return res;
     }
-
+    /* 
+    * 
+    */
     public void eliminar(T elem){
         if(pertenece(elem)){
-            Nodo actual = buscarNodo(elem);
-            if(actual.izq == null && actual.der == null){ //No tiene hijos el elemento a eliminar y tiene padre       
-                if(actual.padre != null){
-                    Nodo padre = actual.padre;
-                    actual = padre;
-                    if(elem.compareTo(actual.padre.valor) > 0){ //Si el elemento está en la rama derecha
-                        actual.der = null;
+            Nodo actual = buscarNodo(elem); //Ahora actual es el nodo a eliminar
+            /*##### NO TIENE HIJOS #####*/
+            if(actual.izq == null && actual.der == null){
+                if(actual.padre != null){ //SI NO ES LA RAIZ (tiene padre)
+                    Nodo padre = actual.padre;                
+                    if(elem.compareTo(padre.valor) > 0){ //Si el elemento está en la rama derecha
+                        actual.padre = null;
+                        padre.der = null;
                         cardinal --;
                     } else { //Sino está en la rama izquierda.
-                        actual.izq = null;
+                        actual.padre = null;
+                        padre.izq = null;
                         cardinal --;
                     }
-                } else { //Si estoy parado en la raiz
+                } else { //SINO ES LA RAIZ
                     raiz = null;
                     cardinal --;
-                }    
+                }
             }
-            else if(actual.izq == null && actual.der != null){ /* ### SI TIENE UN HIJO DERECHO ### */
+            /*##### SI TIENE UN HIJO DERECHO #####*/
+            else if(actual.izq == null && actual.der != null){
+                Nodo hijo = actual.der;
                 if(actual.padre != null){
                     Nodo padre = actual.padre;
-                    if(elem.compareTo(padre.valor) > 0){
-                        actual.padre.der = actual.der;
-                        actual.der.padre = actual.padre;
+                    if(elem.compareTo(padre.valor) > 0){ //si actual es hijo derecho
+                        padre.der = actual.der;
+                        hijo.padre = actual.padre;                
                         cardinal --;
-                    } else {
-                        actual.padre.izq = actual.der;
-                        actual.izq.padre = actual.padre;
+                    } else { //si actual es hijo izq
+                        padre.izq = actual.der;
+                        hijo.padre = actual.padre;
                         cardinal --;
                     }
                 } else { //Si estoy parado en raiz y tiene hijo derecho
-                    (raiz.der).padre = null;
+                    hijo.padre = null;
                     raiz = raiz.der;
                     cardinal --;
                 }
             }
-            else if(actual.izq != null && actual.der == null){ /* ### SI TIENE UN HIJO IZQUIERDO ### */
+            /*###### SI TIENE UN HIJO IZQUIERDO #####*/
+            else if(actual.izq != null && actual.der == null){
+                Nodo hijo = actual.izq;
                 if(actual.padre != null) {
                     Nodo padre = actual.padre;
                     if(elem.compareTo(padre.valor) > 0){ 
-                        actual.padre.der = actual.izq; 
-                        actual.izq.padre = actual.padre;
+                        padre.der = actual.izq; 
+                        hijo.padre = actual.padre;
                         cardinal --;
                     } else {
-                        actual.padre.izq = actual.izq;
-                        actual.izq.padre = actual.padre;
+                        padre.izq = actual.izq;
+                        hijo.padre = actual.padre;
                         cardinal --;
                     }
-                } else {
-                    (raiz.izq).padre = null;
+                } else { //Si estoy parado en la raiz y tiene hijo izquierdo
+                    hijo.padre = null;
                     raiz = raiz.izq;
                     cardinal --;
                 }
             }
-            else{ //Ambos nodos distintos de nulo
+            /*##### TIENE DOS HIJOS #####*/
+            else {
                 Nodo sucesor = sucesor(actual);
-                actual.valor = sucesor.valor;
-            
+                actual.valor = sucesor.valor; //Copio el valor
                 if (sucesor.padre.izq == sucesor) { // Si el sucesor es el hijo izquierdo de su padre
                     sucesor.padre.izq = sucesor.der; 
                 } 
@@ -184,7 +192,7 @@ public class ABB<T extends Comparable<T>> implements Conjunto<T> {
                 cardinal--;
             }
         }
-    }
+    }    
 
     private Nodo sucesor(Nodo nodo){
         if(nodo == null) { //Si el abb es vacio

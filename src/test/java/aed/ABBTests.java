@@ -327,7 +327,7 @@ class ABBTests {
 
     }
 
-    Integer NCLAVES = 10;
+    Integer NCLAVES = 1000;
 
     private Integer clave(Integer i) {
         return NCLAVES * ((i * i - 100 * i) % NCLAVES) + i; //funcion generadora de claves a partir de un indice
